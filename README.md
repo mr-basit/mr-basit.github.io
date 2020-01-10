@@ -1,2 +1,0 @@
-# abdulwaheed.github.io
-resume
