@@ -1,0 +1,25 @@
+#trigger:
+- master
+pool:
+  vmImage: windows-latest  # Use a Windows image for deployment tasks
+
+steps:
+- script: git clone https://$(PAT)@github.com/mr-basit/mr-basit.github.io  # Replace $(PAT) with personal access token secret variable
+  displayName: 'Clone GitHub Repository'
+
+- script: |
+    # Replace with the path where you want to deploy your code on the server (e.g., C:\inetpub\wwwroot\mysite)
+    Set-Location -Path "C:\deployment_path"
+    # Copy all files from the cloned repository to the deployment location
+    cp -r $(Build.SourcesDirectory)/* .
+  displayName: 'Copy Files to Deployment Location'
+
+- script: |
+    # Use WinRM to establish a remote connection and deploy the files
+    # You'll need WinRM configured on the target server (10.17.8.72) for this to work
+    WinRM QuickConfig -ComputerName 10.17.8.72
+    # Replace 'username' and 'password' with actual credentials for the server
+    Enter-PSSession -ComputerName 10.17.8.72 -Credential (New-Object System.Management.Automation.PSCredential('abdul.basit02', (ConvertTo-SecureString 'Am@dev324722' -AsPlainText -Force)))
+    #  (Optional) Additional deployment commands can be added here (e.g., restarting IIS)
+  displayName: 'Deploy using WinRM'
+
